@@ -101,13 +101,71 @@ var Interpreter = function () {
 	  });
 	}
 
-	function evaluateQuery(database, query){
-	  if(!validateDatabase(database) || !validateQuery(query)){
-	    return null;
-	  }
-	  return evaluateFact(database, query);
+	/*returns the full line of the first match in the database to the query name and amount of parameters. Null if not found*/
+	function findQuery(database, query){
+	  var lines=databaseToLines(database); 
+	  var result= lines.find(function(line){
+	      if(!line){
+	        return false;
+	      }
+	      return (parseGroup(line)[1] == parseGroup(query)[1]) && (getParameters(line).length == getParameters(query).length); 
+	  });
+	  return result ? result : null;
 	}
 
+	function replaceParameters(fact, parameterMap){
+	  var newParameters= parseGroup(fact)[2].replace(/\w+/g, function(variable){
+	    return parameterMap[variable];
+	  })
+	  return parseGroup(fact)[1]+newParameters;
+	}
+
+	/*Builds queries that imply rule, with given parameters. Parameters must have same amount of elements that variables in rule.*/
+	function buildMultipleQueries(rule, parameters){
+	  var ruleAndFacts= rule.match(FACT_REGEX);
+	  var ruleVariables= getParameters(ruleAndFacts.shift());
+	  var parameterMap= zipper(ruleVariables, parameters);
+	  var mapper =function(variable){
+	      return parameterMap[variable];
+	  }
+	  var ruleFacts= ruleAndFacts;//note that "facts" could as well be other rules.
+	  for(var i=0; i< ruleFacts.length; i++){
+	    ruleFacts[i]=replaceParameters(ruleFacts[i], parameterMap);
+	  }
+	  return ruleFacts;
+	}
+
+	//Courtesy of SO, that in itself comes from underscore.js (_.object)
+	var zipper = function(list, values) {
+	  if (list == null) return {};
+	  var result = {};
+	  for (var i = 0, l = list.length; i < l; i++) {
+	    if (values) {
+	      result[list[i]] = values[i];
+	    } else {
+	      result[list[i][0]] = list[i][1];
+	    }
+	  }
+	  return result;
+	};
+
+	function evaluateQuery(database, query){
+		if(!validateDatabase(database) || !validateQuery(query)){
+			return null;
+		}
+		var databasePotentialMatch= findQuery(database, query);
+		if(!databasePotentialMatch){
+		  return false;
+		}
+		if(databasePotentialMatch.includes(":-")){
+		  var queriesInRule= buildMultipleQueries(databasePotentialMatch, getParameters(query));
+		  return queriesInRule.every(function(anotherQuery){
+		    return evaluateQuery(database, anotherQuery);
+		  });
+		}else{
+		  return evaluateFact(database, query);
+		}
+	}
 }
 
 module.exports = Interpreter;

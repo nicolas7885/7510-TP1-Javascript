@@ -23,6 +23,39 @@ describe("Interpreter", function () {
         "hijo(X, Y) :- varon(X), padre(Y, X).",
         "hija(X, Y) :- mujer(X), padre(Y, X)."
     ];
+    var invalid_db_onefact = [
+        "varon(juan).",
+        "varon(pepe).",
+        "varon(hector).",
+        "varon(roberto",
+        "varon(alejandro).",
+        "mujer(maria).",
+        "mujer(cecilia).",
+        "padre(juan, pepe).",
+        "padre(juan, pepa).",
+        "padre(hector, maria).",
+        "padre(roberto, alejandro).",
+        "padre(roberto, cecilia.",
+        "hijo(X, Y) :- varon(X), padre(Y, X).",
+        "hija(X, Y) :- mujer(X), padre(Y, X)."
+    ];
+
+    var invalid_db_onerule = [
+        "varon(juan).",
+        "varon(pepe).",
+        "varon(hector).",
+        "varon(roberto",
+        "varon(alejandro).",
+        "mujer(maria).",
+        "mujer(cecilia).",
+        "padre(juan, pepe).",
+        "padre(juan, pepa).",
+        "padre(hector, maria).",
+        "padre(roberto, alejandro).",
+        "padre(roberto, cecilia.",
+        "hijo(X, Y) : varon(X), padre(Y, X).",
+        "hija(X, Y) :- mujer(X), padre(Y, X)."
+    ];
 
     var interpreter = null;
 

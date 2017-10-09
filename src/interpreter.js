@@ -11,6 +11,8 @@ var Interpreter = function () {
 
 	var db = ' ';
 
+	const FACT_REGEX= /([a-zA-Z]*)(\(([\w\s,$]*)\))/g;
+
 }
 
 module.exports = Interpreter;

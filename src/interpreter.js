@@ -14,7 +14,10 @@ var Interpreter = function () {
 	const FACT_REGEX= /([a-zA-Z]*)(\(([\w\s,$]*)\))/g;
 
 	function databaseToLines(database){
-	  return database; //change this if its a file
+		database.forEach(function(line, index, db) {
+			db[index] = line.replace(/\s/g, ''); 
+		});//change this if its a file
+		return database;
 	}
 
 	function parseGroup(group){
@@ -89,6 +92,22 @@ var Interpreter = function () {
 	function validateQuery(query){
 	  return query && validateFact(query);
 	}
+
+	//return true if facts in database imply query, false if not
+	function evaluateFact(database, query){
+	  var lines= databaseToLines(database);
+	  return lines.some(function (line){
+	    return line.includes(query.replace(/\s+/g, ''));
+	  });
+	}
+
+	function evaluateQuery(database, query){
+	  if(!validateDatabase(database) || !validateQuery(query)){
+	    return null;
+	  }
+	  return evaluateFact(database, query);
+	}
+
 }
 
 module.exports = Interpreter;

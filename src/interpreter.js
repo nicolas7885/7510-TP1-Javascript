@@ -45,7 +45,7 @@ var Interpreter = function () {
 	  if(!ruleLine.match(/:-/)){
 	    return false;
 	  }
-	  var intendedFactDelimeterRegex= /(\)[\s]*,)|(,[\s]*\w*\()/gi;
+	  var intendedFactDelimeterRegex= /(\)[\s]*,)|(,[\s]*\w*\()|(\s+)/gi;
 	  numberOfIntendedFacts= (ruleLine.match(intendedFactDelimeterRegex) || []).length +1;
 	  if (parsedRule.length < (numberOfIntendedFacts + 1)){
 	    return false;

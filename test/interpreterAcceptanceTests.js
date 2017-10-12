@@ -77,25 +77,58 @@ describe("Interpreter", function () {
         // runs after each test in this block
     });
 
+    describe('Validate Facts', function () {
+
+        it('varon(juan) should be true', function () {
+            assert(interpreter.checkQuery('varon(juan)'));
+        });
+        it('varonmaria) should be null', function () {
+            assert(interpreter.checkQuery('varonmaria)') === null);
+        });
+        it('mujer(cecilia should be null', function () {
+            assert(interpreter.checkQuery('mujer(cecilia') === null);
+        });
+        it('padre should be null', function () {
+            assert(interpreter.checkQuery('padre') === null);
+        });
+    });
+
+    describe('Validate rules', function () {
+
+        it('hijo(pepe juan) should be null', function () {
+            assert(interpreter.checkQuery('hijo(pepe, juan)') === null);
+        });
+        it('hija(, roberto) should be null', function () {
+            assert(interpreter.checkQuery('hija(, roberto)') === null);
+        });
+        it('hijo(pepe, ) should be null', function () {
+            assert(interpreter.checkQuery('hijo(pepe, )') === null);
+        });
+        it('hija should be null', function () {
+            assert(interpreter.checkQuery('hija') === null);
+        });
+        it('hijopepe, juan) should be null', function () {
+            assert(interpreter.checkQuery('hijopepe, juan)') === null);
+        });
+        it('hijo(pepe, juan  should be null', function () {
+            assert(interpreter.checkQuery('hijo(pepe, juan') === null);
+        });
+    });
 
     describe('Interpreter Facts', function () {
 
         it('varon(juan) should be true', function () {
             assert(interpreter.checkQuery('varon(juan)'));
         });
-
         it('varon(maria) should be false', function () {
             assert(interpreter.checkQuery('varon(maria)') === false);
         });
-
         it('mujer(cecilia) should be true', function () {
             assert(interpreter.checkQuery('mujer(cecilia)'));
         });
-
         it('padre(juan, pepe) should be true', function () {
             assert(interpreter.checkQuery('padre(juan, pepe)') === true);
         });
-
         it('padre(mario, pepe) should be false', function () {
             assert(interpreter.checkQuery('padre(mario, pepe)') === false);
         });

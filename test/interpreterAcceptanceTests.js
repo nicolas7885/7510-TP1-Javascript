@@ -20,8 +20,10 @@ describe("Interpreter", function () {
         "padre(hector, maria).",
         "padre(roberto, alejandro).",
         "padre(roberto, cecilia).",
+        "padre(roberto, juan).",
         "hijo(X, Y) :- varon(X), padre(Y, X).",
-        "hija(X, Y) :- mujer(X), padre(Y, X)."
+        "hija(X, Y) :- mujer(X), padre(Y, X).",
+        "nietoPaterno(X, Y, Z) :- varon(X), hijo(X, Y), hijo(Y, Z)."
     ];
     var invalid_db_onefact = [
         "varon(juan).",
@@ -95,9 +97,6 @@ describe("Interpreter", function () {
 
     describe('Validate rules', function () {
 
-        it('hijo(pepe juan) should be null', function () {
-            assert(interpreter.checkQuery('hijo(pepe, juan)') === null);
-        });
         it('hija(, roberto) should be null', function () {
             assert(interpreter.checkQuery('hija(, roberto)') === null);
         });
@@ -115,6 +114,22 @@ describe("Interpreter", function () {
         });
     });
 
+    describe('Validate database', function () {
+
+        it('valid database not null', function () {
+            assert(interpreter.checkQuery('varon(juan)') != null);
+        });
+        it('one fact invalid makes db null', function () {
+            var tempInterpreter = new Interpreter();
+            tempInterpreter.parseDB(invalid_db_onefact);
+            assert(tempInterpreter.checkQuery('varon(juan)') === null);
+        });
+        it('one rule invalid makes db null', function () {
+            var tempInterpreter = new Interpreter();
+            tempInterpreter.parseDB(invalid_db_onerule);
+            assert(tempInterpreter.checkQuery('varon(juan)') === null);
+        });
+    });
     describe('Interpreter Facts', function () {
 
         it('varon(juan) should be true', function () {
@@ -132,9 +147,6 @@ describe("Interpreter", function () {
         it('padre(mario, pepe) should be false', function () {
             assert(interpreter.checkQuery('padre(mario, pepe)') === false);
         });
-
-        // TODO: Add more tests
-
     });
 
     describe('Interpreter Rules', function () {
@@ -148,12 +160,11 @@ describe("Interpreter", function () {
         it('hijo(pepe, juan) should be true', function () {
             assert(interpreter.checkQuery('hijo(pepe, juan)'));
         });
-
-        // TODO: Add more tests
-
+        it('nietoPaterno(pepe, juan, roberto) should be true', function () {
+            assert(interpreter.checkQuery('nietoPaterno(pepe, juan, roberto)'));
+        });
+        it('nietoPaterno(pepe, hector, roberto) should be false', function () {
+            assert(interpreter.checkQuery('nietoPaterno(pepe, hector, roberto)') === false);
+        });
     });
-
-
 });
-
-
